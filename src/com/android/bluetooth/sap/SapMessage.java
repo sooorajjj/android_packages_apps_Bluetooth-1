@@ -455,17 +455,14 @@ public class SapMessage {
         int paramLength;
         boolean success = true;
         int skipLen = 0;
-
         for(int i = 0; i < count; i++) {
             paramId = is.read();
             is.read(); // Skip the reserved byte
             paramLength = is.read();
             paramLength = paramLength << 8 | is.read();
-
             // As per SAP spec padding should be 0-3 bytes
             if ((paramLength % 4) != 0)
                 skipLen = 4 - (paramLength % 4);
-
             if(VERBOSE) Log.i(TAG, "parsing paramId: " + paramId + " with length: " + paramLength);
             switch(paramId) {
             case PARAM_MAX_MSG_SIZE_ID:
@@ -502,77 +499,91 @@ public class SapMessage {
                 }
                 break;
             case PARAM_CONNECTION_STATUS_ID:
-                // not needed for server role, but used for module test
-                if(paramLength != PARAM_CONNECTION_STATUS_LENGTH) {
-                    Log.e(TAG, "Received PARAM_CONNECTION_STATUS with wrong length: " +
-                            paramLength + " skipping this parameter.");
-                    skip(is, paramLength + skipLen);
-                    success = false;
-                } else {
-                    mConnectionStatus = is.read();
-                    skip(is, 4 - PARAM_CONNECTION_STATUS_LENGTH);
-                }
-                break;
+                // not needed - server -> client
+                if(TEST) {
+                    if(paramLength != PARAM_CONNECTION_STATUS_LENGTH) {
+                        Log.e(TAG, "Received PARAM_CONNECTION_STATUS with wrong length: " +
+                                paramLength + " skipping this parameter.");
+                        skip(is, paramLength + skipLen);
+                        success = false;
+                    } else {
+                        mConnectionStatus = is.read();
+                        skip(is, 4 - PARAM_CONNECTION_STATUS_LENGTH);
+                    }
+                    break;
+                } // Fall through if TEST == false
             case PARAM_CARD_READER_STATUS_ID:
-                // not needed for server role, but used for module test
-                if(paramLength != PARAM_CARD_READER_STATUS_LENGTH) {
-                    Log.e(TAG, "Received PARAM_CARD_READER_STATUS with wrong length: " +
-                            paramLength + " skipping this parameter.");
-                    skip(is, paramLength + skipLen);
-                    success = false;
-                } else {
-                    mCardReaderStatus = is.read();
-                    skip(is, 4 - PARAM_CARD_READER_STATUS_LENGTH);
-                }
-                break;
+                // not needed - server -> client
+                if(TEST) {
+                    if(paramLength != PARAM_CARD_READER_STATUS_LENGTH) {
+                        Log.e(TAG, "Received PARAM_CARD_READER_STATUS with wrong length: " +
+                                paramLength + " skipping this parameter.");
+                        skip(is, paramLength + skipLen);
+                        success = false;
+                    } else {
+                        mCardReaderStatus = is.read();
+                        skip(is, 4 - PARAM_CARD_READER_STATUS_LENGTH);
+                    }
+                    break;
+                } // Fall through if TEST == false
             case PARAM_STATUS_CHANGE_ID:
-                // not needed for server role, but used for module test
-                if(paramLength != PARAM_STATUS_CHANGE_LENGTH) {
-                    Log.e(TAG, "Received PARAM_STATUS_CHANGE with wrong length: " +
-                            paramLength + " skipping this parameter.");
-                    skip(is, paramLength + skipLen);
-                    success = false;
-                } else {
-                    mStatusChange = is.read();
-                    skip(is, 4 - PARAM_STATUS_CHANGE_LENGTH);
-                }
-                break;
+                // not needed - server -> client
+                if(TEST) {
+                    if(paramLength != PARAM_STATUS_CHANGE_LENGTH) {
+                        Log.e(TAG, "Received PARAM_STATUS_CHANGE with wrong length: " +
+                                paramLength + " skipping this parameter.");
+                        skip(is, paramLength + skipLen);
+                        success = false;
+                    } else {
+                        mStatusChange = is.read();
+                        skip(is, 4 - PARAM_STATUS_CHANGE_LENGTH);
+                    }
+                    break;
+                } // Fall through if TEST == false
             case PARAM_RESULT_CODE_ID:
-                // not needed for server role, but used for module test
-                if(paramLength != PARAM_RESULT_CODE_LENGTH) {
-                    Log.e(TAG, "Received PARAM_RESULT_CODE with wrong length: " +
-                            paramLength + " skipping this parameter.");
-                    skip(is, paramLength + skipLen);
-                    success = false;
-                } else {
-                    mResultCode = is.read();
-                    skip(is, 4 - PARAM_RESULT_CODE_LENGTH);
-                }
-                break;
+                // not needed - server -> client
+                if(TEST) {
+                    if(paramLength != PARAM_RESULT_CODE_LENGTH) {
+                        Log.e(TAG, "Received PARAM_RESULT_CODE with wrong length: " +
+                                paramLength + " skipping this parameter.");
+                        skip(is, paramLength + skipLen);
+                        success = false;
+                    } else {
+                        mResultCode = is.read();
+                        skip(is, 4 - PARAM_RESULT_CODE_LENGTH);
+                    }
+                    break;
+                } // Fall through if TEST == false
             case PARAM_DISCONNECT_TYPE_ID:
-                // not needed for server role, but used for module test
-                if(paramLength != PARAM_DISCONNECT_TYPE_LENGTH) {
-                    Log.e(TAG, "Received PARAM_DISCONNECT_TYPE_ID with wrong length: " +
-                            paramLength + " skipping this parameter.");
-                    skip(is, paramLength + skipLen);
-                    success = false;
-                } else {
-                    mDisconnectionType = is.read();
-                    skip(is, 4 - PARAM_DISCONNECT_TYPE_LENGTH);
-                }
-                break;
+                // not needed - server -> client
+                if(TEST) {
+                    if(paramLength != PARAM_DISCONNECT_TYPE_LENGTH) {
+                        Log.e(TAG, "Received PARAM_DISCONNECT_TYPE_ID with wrong length: " +
+                                paramLength + " skipping this parameter.");
+                        skip(is, paramLength + skipLen);
+                        success = false;
+                    } else {
+                        mDisconnectionType = is.read();
+                        skip(is, 4 - PARAM_DISCONNECT_TYPE_LENGTH);
+                    }
+                    break;
+                } // Fall through if TEST == false
             case PARAM_RESPONSE_APDU_ID:
-                // not needed for server role, but used for module test
-                mApduResp = new byte[paramLength];
-                read(is, mApduResp);
-                skip(is, skipLen);
-                break;
+                // not needed - server -> client
+                if(TEST) {
+                    mApduResp = new byte[paramLength];
+                    read(is, mApduResp);
+                    skip(is, skipLen);
+                    break;
+                } // Fall through if TEST == false
             case PARAM_ATR_ID:
-                // not needed for server role, but used for module test
-                mAtr = new byte[paramLength];
-                read(is, mAtr);
-                skip(is, skipLen);
-                break;
+                // not needed - server -> client
+                if(TEST) {
+                    mAtr = new byte[paramLength];
+                    read(is, mAtr);
+                    skip(is, skipLen);
+                    break;
+                } // Fall through if TEST == false
             default:
                 Log.e(TAG, "Received unknown parameter ID: " + paramId + " length: " +
                         paramLength + " skipping this parameter.");

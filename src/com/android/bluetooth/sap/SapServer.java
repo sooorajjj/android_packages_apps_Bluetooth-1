@@ -831,10 +831,8 @@ public class SapServer extends Thread implements Callback {
         if(VERBOSE) Log.i(TAG_HANDLER, "sendRilMessage() - "
                 + SapMessage.getMsgTypeName(sapMsg.getMsgType()));
         try {
-            if(mRilBtOutStream != null) {
+            if (mRilBtOutStream != null)
                 sapMsg.writeReqToStream(mRilBtOutStream);
-            } /* Else SAP was enabled on a build that did not support SAP, which we will not
-               * handle. */
         } catch (IOException e) {
             Log.e(TAG_HANDLER, "Unable to send message to RIL", e);
             SapMessage errorReply = new SapMessage(SapMessage.ID_ERROR_RESP);
